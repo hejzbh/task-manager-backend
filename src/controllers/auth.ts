@@ -30,8 +30,6 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     if (!(await comparePws(password, user.password)))
       throw new CustomError("Invalid credentials", STATUS.UNAUTHORIZED);
 
-    delete (user as any)["password"];
-
     // 7) Generate JWT Acess & Refresh tokens
     const { accessToken, refreshToken } = generateTokens(user.id, user.email);
 
@@ -47,11 +45,13 @@ export async function login(req: Request, res: Response, next: NextFunction) {
       secure: true,
     });
 
+    const { password: _, ...userWithoutPassword } = user;
+
     // Return response
     res.status(200).json({
       message: "You've successfully logged in",
       data: {
-        user,
+        user: userWithoutPassword,
       },
       success: true,
     });
@@ -95,12 +95,12 @@ export async function register(
         STATUS.INTERNAL_SERVER_ERROR
       );
 
+    delete (user as any)["password"];
+
     // 8) User is created, register is done!
     res.status(STATUS.CREATED).json({
       message: `You've successfully registered. Go to the login`,
-      data: {
-        user,
-      },
+      data: {},
       success: true,
     });
   } catch (err) {
