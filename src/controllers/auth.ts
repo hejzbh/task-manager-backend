@@ -95,8 +95,6 @@ export async function register(
         STATUS.INTERNAL_SERVER_ERROR
       );
 
-    delete (user as any)["password"];
-
     // 8) User is created, register is done!
     res.status(STATUS.CREATED).json({
       message: `You've successfully registered. Go to the login`,
