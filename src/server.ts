@@ -27,7 +27,8 @@ app.use(express.json());
 // Cookie Parser
 app.use(cookieParser());
 
-// Rate limiter TODO
+// Rate limiter
+app.use(middlewares.rateLimiter);
 
 // Routes
 app.use("/api/v1/auth", authRouter);
