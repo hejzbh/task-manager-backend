@@ -1,0 +1,20 @@
+export const STATUS = {
+  SUCCESS: 200,
+  CREATED: 201,
+
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  MISSING_DATA: 402,
+  FORBIDDEN: 403,
+
+  NOT_FOUND: 404,
+
+  TOO_MANY_REQUESTS: 429,
+
+  INTERNAL_SERVER_ERROR: 500,
+  BAD_GATEWAY: 502,
+};
+
+export type StatusType = (typeof STATUS)[keyof typeof STATUS];
+
+export default STATUS;
