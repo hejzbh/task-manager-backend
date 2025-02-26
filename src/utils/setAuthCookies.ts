@@ -19,7 +19,7 @@ export function setAuthCookies(
   console.log(domain);
   console.log("❤️❤️❤️❤️👿✅✅💕🐢");
   const options = {
-    httpOnly: true,
+    httpOnly: process.env.NODE_ENV !== "production",
     domain,
     sameSite: "none" as boolean | "none" | "lax" | "strict" | undefined,
     secure: true,
