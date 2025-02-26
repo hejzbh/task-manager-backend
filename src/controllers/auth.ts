@@ -33,18 +33,20 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     // 7) Generate JWT Acess & Refresh tokens
     const { accessToken, refreshToken } = generateTokens(user.id, user.email);
 
+    const domain =
+      req.hostname === "localhost" ? req.hostname : `.${req.hostname}`;
     // 8) Set HTTP only cookies
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       maxAge: 60 * 60 * 24 * 50,
       sameSite: "none",
-      domain: req.hostname,
+      domain,
       secure: true,
     });
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 60 * 60 * 24 * 50,
-      domain: req.hostname,
+      domain,
       sameSite: "none",
       secure: true,
     });
