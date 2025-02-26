@@ -19,7 +19,7 @@ export function setAuthCookies(
   console.log(domain);
   console.log("❤️❤️❤️❤️👿✅✅💕🐢");
   const options = {
-    httpOnly: false,
+    httpOnly: true,
     domain,
     sameSite: "none" as "none",
     secure: true,
