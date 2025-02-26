@@ -18,7 +18,7 @@ export function setAuthCookies(
   }
 
   const options = {
-    httpOnly: true,
+    httpOnly: false,
     domain,
     sameSite: "none" as "none",
     secure: true,
