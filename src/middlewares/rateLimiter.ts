@@ -10,11 +10,10 @@ export async function rateLimiter(
   next: NextFunction
 ) {
   try {
-    console.log("_______");
     const ip = getClientIP(req);
 
     const requests = await redis.incr(ip as string);
-    console.log(requests);
+
     if (requests === 1) {
       redis.expire(ip as string, 1);
       return next();

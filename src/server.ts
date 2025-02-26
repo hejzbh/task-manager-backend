@@ -40,3 +40,22 @@ app.use(middlewares.notFound);
 app.use(middlewares.handleError);
 
 app.listen(PORT, () => console.log(`Server is running on PORT: ${PORT}`));
+
+/*
+(() => {
+  if (process.env.ENV_NODE === "production") {
+    app.listen(PORT, () => console.log(`Server is running on PORT: ${PORT}`));
+  } else {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+
+    const options = {
+      key: fs.readFileSync(__dirname + "/../server.key"),
+      cert: fs.readFileSync(__dirname + "/../server.cert"),
+    };
+
+    https.createServer(options, app).listen(PORT, () => {
+      console.log(`Server is running on port: ${PORT}`);
+    });
+  }
+})(); */

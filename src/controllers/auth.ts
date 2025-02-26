@@ -38,11 +38,13 @@ export async function login(req: Request, res: Response, next: NextFunction) {
       httpOnly: true,
       maxAge: Number(process.env.ACCESS_TOKEN_DURATION!),
       secure: true,
+      sameSite: "none",
     });
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: Number(process.env.REFRESH_TOKEN_DURATION!),
       secure: true,
+      sameSite: "none",
     });
 
     const { password: _, ...userWithoutPassword } = user;
