@@ -49,6 +49,12 @@ app.use(
   }
 );
 
+app.post("/api/v1/test", (req, res) => {
+  console.log(req.body);
+  console.log("✅✅✅✅✅✅✅✅");
+  res.status(201).json({ message: "hello", success: true });
+});
+
 // Not found (Not existing routes)
 app.use(middlewares.notFound);
 
