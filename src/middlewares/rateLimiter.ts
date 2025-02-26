@@ -14,6 +14,7 @@ export async function rateLimiter(
   next: NextFunction
 ) {
   try {
+    console.log("Poziva...");
     const ip = getClientIP(req);
 
     const requests = await redis.incr(ip as string);
