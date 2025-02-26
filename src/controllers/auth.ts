@@ -3,7 +3,9 @@ import STATUS from "constants/status.js";
 import { NextFunction, Request, Response } from "express";
 import User from "schema/user.schema.js";
 import { comparePws } from "utils/comparePws.js";
+import jwt from "jsonwebtoken";
 import { generateTokens } from "utils/generateTokens.js";
+import { setAuthCookies } from "utils/setAuthCookies.js";
 
 export async function login(req: Request, res: Response, next: NextFunction) {
   try {
@@ -31,25 +33,17 @@ export async function login(req: Request, res: Response, next: NextFunction) {
       throw new CustomError("Invalid credentials", STATUS.UNAUTHORIZED);
 
     // 7) Generate JWT Acess & Refresh tokens
-    const { accessToken, refreshToken } = generateTokens(user.id, user.email);
+    const { accessToken, refreshToken } = generateTokens(
+      user._id.toString(),
+      user.email,
+      user.role
+    );
 
-    const domain =
-      req.hostname === "localhost" ? req.hostname : `.${req.hostname}`;
     // 8) Set HTTP only cookies
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      maxAge: 60 * 60 * 24 * 50,
-      sameSite: "none",
-      domain,
-      secure: true,
-    });
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      maxAge: 60 * 60 * 24 * 50,
-      domain,
-      sameSite: "none",
-      secure: true,
-    });
+    setAuthCookies(req, res, [
+      { name: "accessToken", value: accessToken },
+      { name: "refreshToken", value: refreshToken },
+    ]);
 
     const { password: _, ...userWithoutPassword } = user;
 
@@ -105,6 +99,94 @@ export async function register(
     res.status(STATUS.CREATED).json({
       message: `You've successfully registered. Go to the login`,
       data: {},
+      success: true,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function refresh(req: Request, res: Response, next: NextFunction) {
+  try {
+    // 1) Get refreshToken from body or cookie
+
+    const refreshToken = req.cookies["refreshToken"] || req.body?.refreshToken;
+    console.log(refreshToken);
+    // 2) If there is no token
+    if (!refreshToken)
+      throw new CustomError(
+        "There is no refresh token cookie",
+        STATUS.UNAUTHORIZED
+      );
+
+    // 3) Check is refresh token valid
+    const refreshDecoded: any = jwt.verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_KEY!
+    );
+
+    if (!refreshDecoded)
+      throw new CustomError("Refresh toke is invalid", STATUS.UNAUTHORIZED);
+
+    // 3) Generate new tokenns
+    const { accessToken, refreshToken: newRefreshToken } = generateTokens(
+      refreshDecoded.id,
+      refreshDecoded.email,
+      refreshDecoded?.role
+    );
+
+    if (!accessToken || !newRefreshToken)
+      throw new CustomError("Cannot generate tokens", STATUS.UNAUTHORIZED);
+
+    // 4) Set new cookies
+    const settedCookieOptions = setAuthCookies(req, res, [
+      { name: "accessToken", value: accessToken },
+      { name: "refreshToken", value: refreshToken },
+    ]);
+
+    // 5) Return response
+    res.status(200).json({
+      success: true,
+      data: {
+        accessToken: {
+          value: accessToken,
+          options: {
+            ...settedCookieOptions,
+            maxAge: Number(process.env.ACCESS_TOKEN_DURATION) / 1000, // because, frontend set cookies requires secods, not ms
+          },
+        },
+        refreshToken: {
+          value: newRefreshToken,
+          options: {
+            ...settedCookieOptions,
+            maxAge: Number(process.env.REFRESH_TOKEN_DURATION) / 1000,
+          },
+        },
+      },
+      message: "New tokens are successfully generated",
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function profile(req: Request, res: Response, next: NextFunction) {
+  try {
+    const accessToken =
+      req.cookies["accessToken"] || req.headers.authorization?.split(" ")[1];
+
+    if (!accessToken)
+      throw new CustomError("Unauthorized", STATUS.UNAUTHORIZED);
+
+    const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_KEY!);
+
+    if (!decoded) throw new CustomError("Unauthorized", STATUS.UNAUTHORIZED);
+
+    res.status(200).json({
+      message: `You've successfully fetched your profile`,
+      data: {
+        user: decoded,
+      },
       success: true,
     });
   } catch (err) {

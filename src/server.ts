@@ -36,6 +36,9 @@ app.use(middlewares.rateLimiter);
 
 // Routes
 app.use("/api/v1/auth", authRouter);
+app.use("/tasks", (req, res) => {
+  res.status(200).json({ message: "hello", success: true });
+});
 
 // Not found (Not existing routes)
 app.use(middlewares.notFound);
