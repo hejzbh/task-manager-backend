@@ -38,15 +38,11 @@ export async function login(req: Request, res: Response, next: NextFunction) {
       httpOnly: true,
       maxAge: 60 * 60 * 24 * 50,
       secure: true,
-      path: "/",
-      sameSite: "none",
     });
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 60 * 60 * 24 * 50,
       secure: true,
-      sameSite: "none",
-      path: "/",
     });
 
     const { password: _, ...userWithoutPassword } = user;
