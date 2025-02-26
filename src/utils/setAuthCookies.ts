@@ -12,9 +12,12 @@ export function setAuthCookies(
 ) {
   // If domain is not provided
   if (!domain) {
-    domain = req.hostname === "localhost" ? req.hostname : `.${req.hostname}`;
+    domain = req
+      .get("origin")
+      ?.replace(/^https?:\/\//, "")
+      .replace(/[:\d]+/g, ""); // www.domain.com -> domain.com, https://localhost:3000 -> localhost
   }
-
+  console.log(domain);
   const options = {
     httpOnly: true,
     domain,
