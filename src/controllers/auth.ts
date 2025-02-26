@@ -37,11 +37,13 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       maxAge: 60 * 60 * 24 * 50,
+      sameSite: "none",
       secure: true,
     });
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 60 * 60 * 24 * 50,
+      sameSite: "none",
       secure: true,
     });
 
