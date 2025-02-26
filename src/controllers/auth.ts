@@ -109,7 +109,7 @@ export async function register(
 export async function refresh(req: Request, res: Response, next: NextFunction) {
   try {
     // 1) Get refreshToken from body or cookie
-
+    console.log(`REFRESH ✅`);
     const refreshToken = req.cookies["refreshToken"] || req.body?.refreshToken;
     console.log(refreshToken);
     // 2) If there is no token
@@ -172,9 +172,11 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
 
 export async function profile(req: Request, res: Response, next: NextFunction) {
   try {
+    console.log(`Profile ✅`);
+
     const accessToken =
       req.cookies["accessToken"] || req.headers.authorization?.split(" ")[1];
-
+    console.log(`Access: ${accessToken}`);
     if (!accessToken)
       throw new CustomError("Unauthorized", STATUS.UNAUTHORIZED);
 
